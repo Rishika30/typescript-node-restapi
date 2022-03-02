@@ -21,7 +21,11 @@ export const verifyEmail =(req:Request, res:Response)=>{
             bcrypt.compare(uniqueString, hashedUniqueString).then(result=>{
                 if(result){
                     userModel.updateOne({_id:userId}, {verified:true}).then(()=>{
-                        userVerificationModel.deleteOne({userId});
+                        userVerificationModel.deleteOne({userId}).then(()=>{
+                            res.send("User Verification done successfully");
+                        }).catch(err=>{
+                            res.send("Error occurred");
+                        });
                     }).catch(error=>{
                         res.json({
                             message: "Errpr occurred while updating user record to show verified"
