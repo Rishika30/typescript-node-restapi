@@ -139,46 +139,77 @@ const sendVerificationEmail = ({_id, email},res)=>{
    });
 }
 
+//Admin can view all user's info
 export const view= (req:Request, res:Response)=>{
     if(req.user.user.role=="admin"){
         userInfoModel.find().then((p)=>{
-            console.log(p);
+            res.json({
+                data:p
+            });
         }).catch(error=>{
             console.log(error);
         });
     }
 }
 
+//Users can view their info
 export const getPost= (req:Request, res:Response)=>{
-    if(req.user.user.role=="basic" && req.user.user.active=="true" && req.params.id==req.user.user._id){
-        userInfoModel.find().then((p)=>{
-            res.json(p);
+    if(req.user.user.role=="basic" && req.user.user.active=="true"){
+        const email= req.user.user.email;
+        userInfoModel.find({email}).then((user)=>{
+            res.json({user});
+        }).catch(error=>{
+            res.json({error});
         });
     }
 }
 
-export const add= (req:Request, res:Response)=>{
+export const add= async(req:Request, res:Response)=>{
     if(req.user.user.role=="basic" && req.user.user.active==true){
-    userInfoModel.create(req.body as iUserInfo).then(()=>{
-        res.send("User Info created");
-    });
-}else{
-    res.send("Cannot add info");
-}
+        const id= req.user.user._id;
+        const postExist= await userInfoModel.findById(id);
+        if(!postExist){
+        const newUserInfo = new userInfoModel({
+            id: req.user.user._id,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName
+        });
+        newUserInfo.save();
+        res.send("userInfo created");
+//     userInfoModel.create(req.body as iUserInfo).then(()=>{
+//         res.send("User Info created");
+//     });
+      }
+      else{
+          res.sendStatus(403).send("This user already has the info created");
+      }
+    }
+ else{
+     res.send("Cannot add info");
+ }
 }
 
-export const update= (req:Request, res:Response)=>{
+export const update= async(req:Request, res:Response)=>{
     if(req.user.user.role=="basic" && req.user.user.active==true && req.user.user._id == req.params.id){
-        //userInfoModel.name=req.body.name;
-        let user_data = new userInfoModel({_id:req.params.id,name: req.body.name, address:req.body.address});
-        user_data.save().then(()=>{
-            res.json({user_data});
-        }).catch(error=>{
-            res.json(error);
+        const updates= req.body;
+
+        const result= await userInfoModel.findByIdAndUpdate(req.params.id, updates, {new:true});
+        res.json({
+            message:"User info updated",
+            data: result
         });
-}else{
-    res.send("Cannot update info");
+
+        //userInfoModel.name=req.body.name;
+//         let user_data = new userInfoModel({_id:req.params.id,name: req.body.name, address:req.body.address});
+//         user_data.save().then(()=>{
+//             res.json({user_data});
+//         }).catch(error=>{
+//             res.json(error);
+//         });
 }
+//else{
+//     res.send("Cannot update info");
+// }
 }
 
 export const deactivate= (req:Request, res:Response)=>{
