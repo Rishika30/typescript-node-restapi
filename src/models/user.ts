@@ -5,36 +5,43 @@ export interface iUser{
     password: string;
     role:string;
     active:boolean;
+    verified:boolean;
 }
 
 const userSchema = new Schema<iUser>({
     email:{
         type: String,
-        required: true,
-        match: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
+        required: true
+        //match: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
     },
     password:{
         type: String,
         required: true
     },
     role:{
-        type:String,
-        required:true
+        type:String
     },
     active:{
-        type:Boolean,
-        required: true
+        type:Boolean
+    },
+    verified:{
+        type:Boolean
     }
 });
 
 const userModel = model<iUser>('User', userSchema);
 export default userModel;
 
-const admin= new userModel<iUser>({
-    email: "admin@gmail.com",
-    password: "password123",
-    role: "admin",
-    active: true
+userModel.find({email:"admin@gmail.com"}).then(user=>{
+    if(user.length<1){
+        const admin= new userModel<iUser>({
+            email: "admin@gmail.com",
+            password: "password123",
+            role: "admin",
+            active: true,
+            verified:true
+        });
+        
+        admin.save();
+    }
 });
-
-admin.save();

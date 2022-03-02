@@ -2,16 +2,21 @@ import { Schema, model,Types } from "mongoose";
 
 
 export interface iUserInfo{
-    name:string;
-    address:string;
+    postedBy:Types.ObjectId;
+    firstName:string;
+    lastName:string;
 }
 
 const userInfoSchema = new Schema<iUserInfo>({
-    name:{
+    postedBy:{
+        type:"ObjectId",
+        ref:"User"
+    },
+    firstName:{
         type:String,
         required: true
     },
-    address:{
+    lastName:{
         type:String,
         required:true
     }

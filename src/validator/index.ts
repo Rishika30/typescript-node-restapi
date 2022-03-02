@@ -1,15 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 
 export const createPostValidator = (req:Request,res:Response,next:NextFunction)=>{
-    req.check("name", "Write a name").notEmpty();
-    req.check("name", "Name must be between 2 to 20 characters").isLength({
+    req.check("firstName", "Write a name").notEmpty();
+    req.check("firstName", "Name must be between 2 to 20 characters").isLength({
         min: 2,
         max: 20
     });
-    req.check("Address", "Write a Address").notEmpty();
-    req.check("Address", "Address must be between 4 to 2000 characters").isLength({
+    req.check("lastName", "Write a last name").notEmpty();
+    req.check("lastName", "last name must be between 4 to 20 characters").isLength({
         min: 4,
-        max: 2000
+        max: 20
     });
 
     //check for errors

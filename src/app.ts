@@ -12,8 +12,8 @@ mongoose.connection.on('error', err =>{
     console.log(`DB Connection error: ${err.message}`);
 });
 
+app.use(express.json());
 app.use(expressValidator());
-
 app.use("/",postRoutes);
 
 
