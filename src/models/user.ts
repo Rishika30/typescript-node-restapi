@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-
+import bcrypt from "bcrypt";
 export interface iUser{
     email: string;
     password: string;
@@ -34,14 +34,16 @@ export default userModel;
 
 userModel.find({email:"admin@gmail.com"}).then(user=>{
     if(user.length<1){
-        const admin= new userModel<iUser>({
-            email: "admin@gmail.com",
-            password: "password123",
-            role: "admin",
-            active: true,
-            verified:true
+        const pass:string= "password123"; 
+        bcrypt.hash(pass,10).then((hash)=>{
+            const admin= new userModel<iUser>({
+                email: "admin@gmail.com",
+                password: hash,
+                role: "admin",
+                active: true,
+                verified:true
+            });
+            admin.save();
         });
-        
-        admin.save();
     }
 });
