@@ -1,13 +1,14 @@
 import express from "express";
 const router = express.Router();
 import {signup, login, token, view, viewPost, add, update, deactivate,activate, ensureToken} from "../controller/posts";
+import {limiter} from "../rateLimiting";
 import {isAuthenticatedValidator, createPostValidator} from "../validator/index";
 import {verifyEmail} from "../emailVerification/verify";
 
 router.use('/user', ensureToken);
 router.post("/signup", isAuthenticatedValidator, signup);
-router.post('/login', isAuthenticatedValidator,login);
-router.post('/token', token);
+router.post('/login',limiter, isAuthenticatedValidator,login);
+router.post('/token',token);
 router.get('/user/:id/data',view);
 router.get('/user/:id/viewPost', viewPost);
 router.post('/user/:id/data', createPostValidator,add);
