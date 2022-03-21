@@ -48,12 +48,14 @@ export const login= async(req:Request, res:Response, next:NextFunction)=>{
     if(!user){
         throw new AppError("Mail not registered", 404);
     }
-    createLock(req.body.email);
-    if(checkLocked(req.body.email)){
-        if(lockTime(req.body.email)){
+    await createLock(req.body.email);
+    const isAccountLocked = await checkLocked(req.body.email);
+    if(isAccountLocked){
+        const isLocked =await lockTime(req.body.email);
+        if(isLocked){
             throw new AppError("Account locked due to invalid attempts.Try again after 60 seconds",401);
         }
-        resetLock(req.body.email);
+        await resetLock(req.body.email);
     }
         const pass = req.body.password;
         const match= await bcrypt.compare(pass, user.password);
