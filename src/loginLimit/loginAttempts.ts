@@ -1,44 +1,73 @@
-import {Response } from "express";
-
-import { NextFunction } from "express";
-
-
+import Locks, {ILock} from "../models/locks";
 
 const MAX_ATTEMPTS: number = 3;
-const LOCK_DURATION: number = 60;
+const LOCK_DURATION: number = 1;
 
-export const lock ={
-  attempts:0,
-  isLocked:false,
-  unlocksAt:null,
+ export const createLock=(email)=>{
+     Locks.find({email:email}).then(lock=>{
+     if(lock.length<1){
+        const lock= new Locks<ILock>({
+          email:email,
+          attempts:0,
+          isLocked:false,
+          unlocksAt:null
+        });
+        lock.save();
+    }
+  });
 }
 
-export const locks={}
 
-export const checkAttempts = (email) => {
-  if (
-    locks[email] &&
-    locks[email].isLocked &&
-    locks[email].unlocksAt > new Date()
-  ) {
-    return (locks[email].attempts);
+ export const checkLocked= (email):boolean=>{
+  let a:number;
+   Locks.findOne({email}, function(err,lock){
+     if(lock.isLocked){
+       a=1;
+     }else{
+       a=0;
+     }
+   });
+   if(a==1){
+    return true;
+    }
+    else{
+      return false;
+    }
+}
+
+export const lockTime= (email)=>{
+  let a:number;
+    Locks.findOne({email}, function(err,lock){
+      if(lock.unlocksAt > new Date()){
+        a=1;
+      }
+      else{
+        a=0;
+      }
+   })
+   if(a==0){
+     return false;
+   }else{
+     return true;
+   }
+}
+
+
+export const invalidAttempt = async(email) => {
+  const lock= await Locks.findOneAndUpdate({email},{$inc: {attempts:1}} , {new:true});
+    if(lock.attempts>MAX_ATTEMPTS){
+     const d = new Date();
+     d.setMinutes(d.getMinutes() + LOCK_DURATION);
+     lock.isLocked = true;
+     lock.unlocksAt = d;
+     lock.save();
   }
-  return (locks[email].attempts);
 };
 
-export const invalidAttempt = (email) => {
-  locks[email]=lock;
-  locks[email].attempts += 1;
-  if (locks[email].attempts > MAX_ATTEMPTS) {
-    const d: Date = new Date();
-    d.setSeconds(d.getSeconds() + LOCK_DURATION);
-    locks[email].isLocked = true;
-    locks[email].unlocksAt = d;
-  }
+export const resetLock = (email) => {
+  const updates= {attempts:0, isLocked:false, unlocksAt:null};
+  const result= Locks.findOneAndUpdate({email}, updates, {new:true});
+  console.log(result);
 };
 
-export const deleteLocks = (email) => {
-  if (locks[email]) {
-    delete locks[email];
-  }
-};
+

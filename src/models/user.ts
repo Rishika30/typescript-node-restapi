@@ -29,6 +29,7 @@ const userSchema = new Schema<iUser>({
     }
 });
 
+
 const userModel = model<iUser>('User', userSchema);
 export default userModel;
 
@@ -41,7 +42,7 @@ userModel.find({email:"admin@gmail.com"}).then(user=>{
                 password: hash,
                 role: "admin",
                 active: true,
-                verified:true
+                verified:true,
             });
             admin.save();
         });

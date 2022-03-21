@@ -9,7 +9,8 @@ import userInfoModel, {iUserInfo } from "../models/userInfo";
 import userVerificationModel from "../models/userVerification";
 import {transporter} from "../emailVerification/verify";
 import {AppError} from "../errorController/appError";
-import {invalidAttempt,checkAttempts,deleteLocks} from "../loginLimit/loginAttempts";
+import {createLock,invalidAttempt,resetLock} from "../loginLimit/loginAttempts";
+import {checkLocked, lockTime} from "../loginLimit/loginAttempts";
 let refreshTokens:string[]= [];
 
 export const signup = async(req:Request,res:Response, next:NextFunction)=>{
@@ -47,12 +48,13 @@ export const login= async(req:Request, res:Response, next:NextFunction)=>{
     if(!user){
         throw new AppError("Mail not registered", 404);
     }
-    const a= checkAttempts(req.body.email);
-        if(a>3){
+    createLock(req.body.email);
+    if(checkLocked(req.body.email)){
+        if(lockTime(req.body.email)){
             throw new AppError("Account locked due to invalid attempts.Try again after 60 seconds",401);
         }
-        
-        deleteLocks(req.body.email);
+        resetLock(req.body.email);
+    }
         const pass = req.body.password;
         const match= await bcrypt.compare(pass, user.password);
         if(!match){
