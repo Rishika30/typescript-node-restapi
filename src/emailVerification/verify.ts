@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import {Request, Response, NextFunction} from "express";
-import userVerificationModel, {iUserVerification} from "../models/userVerification";
+import userVerificationModel from "../models/userVerification";
 import userModel from "../models/user";
 
 export const transporter = nodemailer.createTransport({

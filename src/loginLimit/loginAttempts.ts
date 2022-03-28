@@ -4,7 +4,7 @@ const MAX_ATTEMPTS: number = 3;
 const LOCK_DURATION: number = 1;
 
  export const createLock= async(email)=>{
-     const lock= await Locks.find({email:email});
+     const lock= await Locks.find({email});
      if(lock.length<1){
         const lock= new Locks<ILock>({
           email:email,

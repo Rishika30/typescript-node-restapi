@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
-export interface iUser{
+export interface IUser{
     email: string;
     password: string;
     role:string;
@@ -8,7 +8,7 @@ export interface iUser{
     verified:boolean;
 }
 
-const userSchema = new Schema<iUser>({
+const userSchema = new Schema<IUser>({
     email:{
         type: String,
         required: true
@@ -30,14 +30,14 @@ const userSchema = new Schema<iUser>({
 });
 
 
-const userModel = model<iUser>('User', userSchema);
+const userModel = model<IUser>('User', userSchema);
 export default userModel;
 
 userModel.find({email:"admin@gmail.com"}).then(user=>{
     if(user.length<1){
         const pass:string= "password123"; 
         bcrypt.hash(pass,10).then((hash)=>{
-            const admin= new userModel<iUser>({
+            const admin= new userModel<IUser>({
                 email: "admin@gmail.com",
                 password: hash,
                 role: "admin",

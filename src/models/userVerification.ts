@@ -1,11 +1,11 @@
 import {Schema, model} from "mongoose";
 
-export interface iUserVerification{
+export interface IUserVerification{
     userId: string;
     uniqueString:string;
 }
 
-const userVerificationSchema = new Schema<iUserVerification>({
+const userVerificationSchema = new Schema<IUserVerification>({
     userId:{
         type:String,
         required:true
@@ -16,6 +16,6 @@ const userVerificationSchema = new Schema<iUserVerification>({
     }
 });
 
-const userVerificationModel = model<iUserVerification>('UserVerification', userVerificationSchema);
+const userVerificationModel = model<IUserVerification>('UserVerification', userVerificationSchema);
 export default userVerificationModel;
 

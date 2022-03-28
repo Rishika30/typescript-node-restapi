@@ -5,7 +5,7 @@ import {v4 as uuidv4} from "uuid";
 import dotenv from 'dotenv';
 dotenv.config();
 import userModel from "../models/user";
-import userInfoModel, {iUserInfo } from "../models/userInfo";
+import userInfoModel from "../models/userInfo";
 import userVerificationModel from "../models/userVerification";
 import {transporter} from "../emailVerification/verify";
 import {AppError} from "../errorController/appError";
@@ -14,32 +14,27 @@ import {checkLocked, lockTime} from "../loginLimit/loginAttempts";
 let refreshTokens:string[]= [];
 
 export const signup = async(req:Request,res:Response, next:NextFunction)=>{
-    await userModel.find({email:req.body.email}).exec()
-    .then((user)=>{
-        if(user.length>=1){
-            throw new AppError('Email already exists',409);
+    try{
+    const user= await userModel.find({email:req.body.email});
+    if(user.length>=1){
+        throw new AppError('Email already exists',409);
+    }
+    const pass:string= req.body.password;
+    const hash = await bcrypt.hash(pass, 10);
+    if(hash){
+        const newUser= await userModel.create({email:req.body.email, password:hash, role: "basic", active: true,verified:false});
+        if(!newUser){
+            throw new AppError('Something went wrong',400);
         }
-        const pass:string= req.body.password;
-        bcrypt.hash(pass, 10).then(hash =>{
-                userModel.create({email:req.body.email, password:hash, role: "basic", active: true,verified:false})
-                .then((result)=>{
-                    sendVerificationEmail(result,res);
-                    res.json({
-                        message:"User Registered and Verification mail sent",
-                        data: result
-                    });
-                })
-                .catch((err)=>{
-                    if(err){
-                        res.json({error:err});
-                    }
-                });
-            }).catch((err)=>{
-                res.json({error:err});
-            });
-    }).catch(e=>{
-        next(e);
-    });
+        sendVerificationEmail(newUser,res);
+        res.json({
+            message:"User Registered and Verification mail sent",
+            data: newUser
+        });
+    }
+   }catch(error){
+       next(error);
+   }
 }
 
 export const login= async(req:Request, res:Response, next:NextFunction)=>{

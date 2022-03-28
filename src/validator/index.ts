@@ -20,18 +20,6 @@ export const isAuthenticatedValidator =(req:Request, res:Response, next:NextFunc
     next();
 }
 
-// import {oneOf,check} from 'express-validator/check';
-// export const emailValidation =(req:Request, res:Response, next:NextFunction)=>{
-//     const validation=[
-//         check('email')
-//         .exists()
-//         .withMessage('Email is required')
-//         .isEmail()
-//         .withMessage('Email is not valid')
-//     ];
-// }
-
-
 export const createPostValidator = (req:Request,res:Response,next:NextFunction)=>{
      req.check("firstName", "Write a name").notEmpty();
      req.check("firstName", "Name must be between 2 to 20 characters").isLength({
