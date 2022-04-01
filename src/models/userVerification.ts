@@ -1,4 +1,4 @@
-import {Schema, model} from "mongoose";
+import { Schema, model } from 'mongoose';
 
 export interface IUserVerification{
     userId: string;
@@ -6,16 +6,15 @@ export interface IUserVerification{
 }
 
 const userVerificationSchema = new Schema<IUserVerification>({
-    userId:{
-        type:String,
-        required:true
-    },
-    uniqueString:{
-        type:String,
-        required:true
-    }
+  userId: {
+    type: String,
+    required: true,
+  },
+  uniqueString: {
+    type: String,
+    required: true,
+  },
 });
 
-const userVerificationModel = model<IUserVerification>('UserVerification', userVerificationSchema);
-export default userVerificationModel;
-
+const UserVerificationModel = model<IUserVerification>('UserVerification', userVerificationSchema);
+export default UserVerificationModel;

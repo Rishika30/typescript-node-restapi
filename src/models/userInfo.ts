@@ -1,5 +1,4 @@
-import { Schema, model} from "mongoose";
-
+import { Schema, model } from 'mongoose';
 
 export interface IUserInfo{
     id:string;
@@ -8,20 +7,20 @@ export interface IUserInfo{
 }
 
 const userInfoSchema = new Schema<IUserInfo>({
-    id:{
-        type:String,
-        required:true
-    },
-    firstName:{
-        type:String,
-        required: true
-    },
-    lastName:{
-        type:String,
-        required:true
-    }
-})
+  id: {
+    type: String,
+    required: true,
+  },
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+  },
+});
 
-const userInfoModel = model<IUserInfo>('UserInfo', userInfoSchema);
+const UserInfoModel = model<IUserInfo>('UserInfo', userInfoSchema);
 
-export default userInfoModel;
+export default UserInfoModel;
