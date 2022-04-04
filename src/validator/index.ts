@@ -14,7 +14,7 @@ export const isAuthenticatedValidator = (req:Request, res:Response, next:NextFun
 
   // if error show the first one as they happen
   if (errors) {
-    const firstError = errors.map((error:any) => error.msg)[0];
+    const firstError = errors.map((error) => error.msg)[0];
     return res.status(400).json({ error: firstError });
   }
   next();
@@ -37,7 +37,7 @@ export const createPostValidator = (req:Request, res:Response, next:NextFunction
 
   // if error show the first one as they happen
   if (errors) {
-    const firstError = errors.map((error:any) => error.msg)[0];
+    const firstError = errors.map((error) => error.msg)[0];
     return res.status(400).json({ error: firstError });
   }
 

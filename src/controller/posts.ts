@@ -109,7 +109,7 @@ export const login = async (req:Request, res:Response, next:NextFunction) => {
       const refreshToken:string = jwt.sign(userr, process.env.REFRESH_TOKEN_SECRET);
       refreshTokens.push(refreshToken);
 
-      return res.json({ accessToken, id: userr._id, refreshToken });
+      res.json({ accessToken, id: userr._id, refreshToken });
     }
     throw new AppError('User is not active', 403);
   } catch (error) {
@@ -118,12 +118,14 @@ export const login = async (req:Request, res:Response, next:NextFunction) => {
 };
 
 export function ensureToken(req:Request, res:Response, next:NextFunction) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
-  if (token == null) {
-    return res.sendStatus(401).json({ error: 'Not Authenticated' });
-  }
   try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) {
+      res.sendStatus(401).json({ error: 'Not Authenticated' });
+      return;
+    }
+
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, data) => {
       if (err) {
         throw new AppError('Token not verified', 403);
@@ -139,18 +141,18 @@ export function ensureToken(req:Request, res:Response, next:NextFunction) {
 export const token = (req:Request, res:Response, next:NextFunction) => {
   const refreshToken = req.body.token;
   if (refreshToken == null) {
-    return res.sendStatus(401);
+    res.sendStatus(401);
+    return;
   }
   if (!refreshTokens.includes(refreshToken)) {
-    return res.sendStatus(403);
+    res.sendStatus(403);
+    return;
   }
   try {
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err:any, user) => {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
       if (err) {
         throw new AppError('Token not verified', 403);
-        // return res.sendStatus(403);
       }
-      // console.log(user);
       const accessToken = generateToken({
         _id: user._id, role: user.role, active: user.active, verified: user.verified,
       });
@@ -180,7 +182,7 @@ export const viewPost = async (req:Request, res:Response, next:NextFunction) => 
     if (req.user.role === 'basic' && req.user.active === true && req.user._id === req.params.id) {
       const { id } = req.params;
       const info = await UserInfoModel.find({ id });
-      return res.json({ info });
+      res.json({ info });
     }
     throw new AppError('Cannot find info', 401);
   } catch (e) {
@@ -205,7 +207,7 @@ export const add = async (req:Request, res:Response, next:NextFunction) => {
         lastName: req.body.lastName,
       });
       newUserInfo.save();
-      return res.send('userInfo created');
+      res.send('userInfo created');
     }
     throw new AppError('Cannot add info', 401);
   } catch (e) {
@@ -219,18 +221,21 @@ export const update = async (req:Request, res:Response, next:NextFunction) => {
       const updates = req.body;
       if (updates.firstName) {
         if ((updates.firstName).length < 2 || (updates.firstName).length > 20) {
-          return res.json('Name must be between 2 to 20 characters');
+          res.json('Name must be between 2 to 20 characters');
+          return;
         }
       }
       if (updates.lastName) {
         if ((updates.lastName).length < 4 || (updates.lastName).length > 20) {
-          return res.json('Last name must be between 4 to 20 characters');
+          res.json('Last name must be between 4 to 20 characters');
+          return;
         }
       }
 
-      const result = await UserInfoModel.findOneAndUpdate(req.params, updates, { runValidators: true, new: true });
+      const result = await
+      UserInfoModel.findOneAndUpdate(req.params, updates, { runValidators: true, new: true });
 
-      return res.json({
+      res.json({
         message: 'User info updated',
         data: result,
       });
@@ -245,11 +250,12 @@ export const deactivate = async (req:Request, res:Response, next:NextFunction) =
   try {
     if (req.user.role === 'admin') {
       const updateActive = { active: false };
-      const user = await UserModel.findOneAndUpdate({ _id: req.params.id }, updateActive, { new: true });
+      const user = await
+      UserModel.findOneAndUpdate({ _id: req.params.id }, updateActive, { new: true });
       if (!user) {
         throw new AppError('Cannot find user', 409);
       }
-      return res.json({ user });
+      res.json({ user });
     }
     throw new AppError('Cannot deactivate user', 401);
   } catch (e) {
@@ -266,7 +272,7 @@ export const activate = async (req:Request, res:Response, next:NextFunction) => 
       }
       user.active = true;
       user.save();
-      return res.json({ user });
+      res.json({ user });
     }
     throw new AppError('Cannot activate user', 401);
   } catch (e) {

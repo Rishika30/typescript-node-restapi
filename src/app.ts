@@ -6,8 +6,8 @@ import dotenv from 'dotenv';
 import expressValidator from 'express-validator';
 import postRoutes from './routes/posts';
 
-import { AppError } from './errorController/appError';
-import { errorHandler } from './errorController/errorHandler';
+import AppError from './errorController/appError';
+import errorHandler from './errorController/errorHandler';
 
 dotenv.config();
 

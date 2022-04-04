@@ -7,7 +7,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true
-    //"typeRoots": ["src", "node_modules/@types"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]
