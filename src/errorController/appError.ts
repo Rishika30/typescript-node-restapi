@@ -1,4 +1,5 @@
-export default class AppError extends Error {
+// eslint-disable-next-line import/prefer-default-export
+export class AppError extends Error {
   readonly statusCode;
 
   constructor(message:string, statusCode) {

@@ -7,7 +7,7 @@ import UserModel from '../models/user';
 import UserInfoModel from '../models/userInfo';
 import UserVerificationModel from '../models/userVerification';
 import { transporter } from '../emailVerification/verify';
-import AppError from '../errorController/appError';
+import { AppError } from '../errorController/appError';
 import {
   createLock, invalidAttempt, resetLock, checkLocked, lockTime,
 } from '../loginLimit/loginAttempts';

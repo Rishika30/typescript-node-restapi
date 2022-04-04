@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import userVerificationModel from '../models/userVerification';
 import userModel from '../models/user';
+import { AppError } from '../errorController/appError';
 
 export const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -11,22 +12,18 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
-export const verifyEmail = async (req:Request, res:Response) => {
-  const { userId } = req.params;
-  const result = await userVerificationModel.find({ userId });
-  if (result) {
-    await userModel.updateOne({ _id: userId }, { verified: true }).then(() => {
-      userVerificationModel.deleteOne({ userId }).then(() => {
-        res.send('User Verification done successfully');
-      }).catch((err) => {
-        res.send(`Error occurred: ${err}`);
-      });
-    }).catch((err) => {
-      res.json({
-        message: `Error occurred while updating user record to show verified :${err}`,
-      });
-    });
-  } else {
-    res.send('Invalid verification details sent');
+export const verifyEmail = async (req:Request, res:Response, next:NextFunction) => {
+  try {
+    const { userId } = req.params;
+    const result = await userVerificationModel.find({ userId });
+    if (result) {
+      await userModel.updateOne({ _id: userId }, { verified: true });
+      await userVerificationModel.deleteOne({ userId });
+      res.send('User Verification done successfully');
+      return;
+    }
+    throw new AppError('Invalid verification details sent', 422);
+  } catch (e) {
+    next(e);
   }
 };
