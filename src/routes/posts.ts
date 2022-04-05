@@ -5,6 +5,7 @@ import {
 import limiter from '../rateLimiting';
 import { isAuthenticatedValidator, createPostValidator } from '../validator/index';
 import { verifyEmail } from '../emailVerification/verify';
+import { forgotPassword, resetPassword } from '../passwordReset/passwordReset';
 
 const router = express.Router();
 
@@ -19,5 +20,7 @@ router.patch('/user/:id/data', update);
 router.get('/user/:id/deactivate', deactivate);
 router.get('/user/:id/activate', activate);
 router.get('/verify/:userId/:uniqueString', verifyEmail);
+router.get('/forgotPassword', forgotPassword);
+router.post('/resetPassword', resetPassword);
 
 export= router;

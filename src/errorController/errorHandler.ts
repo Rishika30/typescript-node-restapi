@@ -1,12 +1,6 @@
 import { Request, Response } from 'express';
 import { AppError } from './appError';
 
-interface Error {
-    statusCode?: number;
-    message: string;
-    stack: string;
-}
-
 const errorHandler = (err:Error, req:Request, res:Response) => {
   if (err instanceof AppError) {
     const { statusCode } = err;
