@@ -1,12 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 import UserModel from '../models/user';
 import UserInfoModel from '../models/userInfo';
-import UserVerificationModel from '../models/userVerification';
-import { transporter } from '../emailVerification/verify';
+import { sendVerificationEmail } from '../emailVerification/verify';
 import { AppError } from '../errorController/appError';
 import {
   createLock, invalidAttempt, resetLock, checkLocked, lockTime,
@@ -15,36 +13,6 @@ import {
 dotenv.config();
 
 const refreshTokens:string[] = [];
-
-const sendVerificationEmail = ({ _id, email }) => {
-  const currUrl = 'http://localhost:3000/';
-  const uniqueString = uuidv4() + _id;
-
-  const mailOptions = {
-    from: process.env.AUTH_EMAIL,
-    to: email,
-    subject: 'Email Verification',
-    html: `<p>Verify your email address to complete the signup process.
-          <p> Press <a href= ${`${currUrl}verify/${_id}/${uniqueString}`}> here </a> to proceed </p>`,
-  };
-
-  const newVerification = new UserVerificationModel({
-    userId: _id,
-    uniqueString,
-  });
-
-  newVerification.save().then(() => {
-    transporter.sendMail(mailOptions, (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Verification mail sent');
-      }
-    });
-  }).catch((e) => {
-    console.log(e);
-  });
-};
 
 function generateToken(user) {
   return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });

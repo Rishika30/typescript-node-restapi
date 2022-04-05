@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import AppError from './appError';
+import { AppError } from './appError';
 
 interface Error {
     statusCode?: number;
